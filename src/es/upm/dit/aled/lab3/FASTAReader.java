@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -135,8 +136,16 @@ public class FASTAReader {
 	 * pattern when one has been found to be different.
 	 */
 	private boolean compareImproved(byte[] pattern, int position) throws FASTAException {
-		// TODO
-		return false;
+		if (position + pattern.length > validBytes) {
+			throw new FASTAException("Pattern goes beyond the end of the file.");
+		}
+		boolean match = true;
+		for (int i = 0; i < pattern.length; i++) {
+			if (pattern[i] != content[position + i]) {
+				return false;
+			}
+		}
+		return match;
 	}
 
 	/*
@@ -148,8 +157,16 @@ public class FASTAReader {
 	 * ones present in the indicated position.
 	 */
 	private int compareNumErrors(byte[] pattern, int position) throws FASTAException {
-		// TODO
-		return -1;
+		if (position + pattern.length > validBytes) {
+			throw new FASTAException("Pattern goes beyond the end of the file.");
+		}
+		int coincidentes = 0;
+		for (int i = 0; i < pattern.length; i++) {
+			if (pattern[i] != content[position + i]) {
+				coincidentes++;
+			}
+		}
+		return coincidentes;
 	}
 
 	/**
@@ -162,8 +179,19 @@ public class FASTAReader {
 	 *         pattern in the data.
 	 */
 	public List<Integer> search(byte[] pattern) {
-		// TODO
-		return null;
+		List<Integer> posiciones = new ArrayList<>();
+		try {
+		for(int i = 0; i < (validBytes-pattern.length); i++) {
+			if(compare(pattern,i)) {
+				posiciones.add(i);
+			}
+		}
+		}catch (FASTAException e) {
+			System.out.println(e.getMessage());
+		}
+			
+				
+		return posiciones;
 	}
 
 	/**
@@ -179,8 +207,19 @@ public class FASTAReader {
 	 *         pattern (with up to 1 errors) in the data.
 	 */
 	public List<Integer> searchSNV(byte[] pattern) {
-		// TODO
-		return null;
+		List<Integer> posiciones = new ArrayList<>();
+		try {
+		for(int i = 0; i < (validBytes-pattern.length); i++) {
+			if(compareNumErrors(pattern,i) == 0 || compareNumErrors(pattern,i) == 1) {
+				posiciones.add(i);
+			}
+		}
+		}catch (FASTAException e) {
+			System.out.println(e.getMessage());
+		}
+			
+				
+		return posiciones;
 	}
 
 	public static void main(String[] args) {
@@ -190,7 +229,7 @@ public class FASTAReader {
 			return;
 		System.out.println("Tiempo de apertura de fichero: " + (System.nanoTime() - t1));
 		long t2 = System.nanoTime();
-		List<Integer> posiciones = reader.search(args[1].getBytes());
+		List<Integer> posiciones = reader.searchSNV(args[1].getBytes());
 		System.out.println("Tiempo de búsqueda: " + (System.nanoTime() - t2));
 		if (posiciones.size() > 0) {
 			for (Integer pos : posiciones)
@@ -200,3 +239,14 @@ public class FASTAReader {
 		System.out.println("Tiempo total: " + (System.nanoTime() - t1));
 	}
 }
+
+
+//533793122 búsqueda compareImproved con break
+//3461400503 búsqueda compare
+//519837119 búsqueda compareImproved con return false
+//15830099 búsqueda segment compareImproved con return false
+//19640374 búsqueda segment compare 
+
+//33762129 búsqueda segment searchSNV
+
+
