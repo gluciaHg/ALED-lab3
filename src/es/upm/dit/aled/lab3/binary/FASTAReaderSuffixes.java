@@ -1,5 +1,6 @@
 package es.upm.dit.aled.lab3.binary;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -78,7 +79,18 @@ public class FASTAReaderSuffixes extends FASTAReader {
 	 */
 	@Override
 	public List<Integer> search(byte[] pattern) {
-		// TODO
+		List<Integer> resultados = new ArrayList<>();
+		int lo = 0;
+		int hi = suffixes.length;
+		boolean found = false;
+		int index = 0;
+		
+		for(int i = 0; i < suffixes.length; i++) {
+		int m = (lo+(hi-lo)/2);
+		Suffix posSuffix = suffixes[m];
+		
+		
+		}
 		return null;
 	}
 
