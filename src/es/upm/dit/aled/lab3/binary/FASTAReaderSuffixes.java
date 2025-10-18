@@ -85,24 +85,50 @@ public class FASTAReaderSuffixes extends FASTAReader {
 		boolean found = false;
 		int index = 0;
 		
-		while(found == false || (hi - lo) <= -1) {
+		while(found == false || lo <= hi) {
 				int m = (lo+(hi-lo)/2);
 				int posSuffix = suffixes[m].suffixIndex;
-				if(pattern[index] == content[posSuffix + index]) {
-					index++;
-				}
+				while (index < pattern.length && posSuffix + index < validBytes && pattern[index] == content[posSuffix + index] ) {
+			            index++;
+			    }
 				if (index == pattern.length) {
 					found = true;
 					resultados.add(posSuffix);
 				}
-				else if (pattern[index] < content[posSuffix + index]) {
-					hi = m-1;
-					index = 0;
+				int arriba = m-1;
+				while (arriba >= 0) {
+					int posArriba = suffixes[arriba].suffixIndex;
+					int a = 0;
+					while (a < pattern.length && posArriba + a < validBytes && pattern[a] == content[posArriba + a]) {
+						a++;
+					}
+					if(a == pattern.length) {
+						resultados.add(posArriba);
+						arriba--;
+					} else break;
 				}
-				else if (pattern[index] > content[posSuffix + index]) {
-					lo = m+1;
-					index = 0;
+				int abajo = m+1;
+				while(abajo < suffixes.length) {
+					int posAbajo = suffixes[abajo].suffixIndex;
+					int b = 0;
+					while (b < pattern.length && posAbajo + b < validBytes && pattern[b] == content[posAbajo + b]) {
+						b++;
+					}
+					if(b == pattern.length) {
+						resultados.add(posAbajo);
+						abajo++;
+					}else break;
 				}
+				if (index < pattern.length) {
+					if (pattern[index] < content[posSuffix + index]) {
+						hi = m-1;
+						index = 0;
+					}
+					else {
+						lo = m+1;
+					}
+				}else break;
+				
 			
 		
 		}
@@ -130,3 +156,12 @@ public class FASTAReaderSuffixes extends FASTAReader {
 		System.out.println("Tiempo total: " + (System.nanoTime() - t1));
 	}
 }
+
+// search normal 78292
+/*for(int i = posSuffix+1; i < content.length; i++) {
+						
+					}
+					for(int j = posSuffix-1; j >= 0; j--) {
+						
+					}
+					*/
